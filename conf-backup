@@ -18,6 +18,7 @@ MANIFEST=(
   "/etc/sysctl.d|system-sysctl.d|root:root"
   "/etc/local.d|system-local.d|root:root"
   "/etc/rc.conf|system|root:root"
+  "/etc/ananicy.d|system-ananicy.d|root:root"
 )
 # ---------------------------------------------------------------------------
 

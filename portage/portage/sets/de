@@ -57,6 +57,6 @@ x11-apps/mesa-progs
 
 #misc bits plasma-meta was rolling in before:
 sys-apps/smartmontools
-
+app-admin/ananicy-cpp
 
 
