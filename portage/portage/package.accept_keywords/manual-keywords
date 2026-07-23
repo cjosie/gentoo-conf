@@ -1,0 +1,58 @@
+#manual keyword accepts
+# perf tuning bits
+app-admin/ananicy-cpp ~amd64
+#kernel always accept latest:
+sys-kernel/gentoo-sources ~amd64
+sys-kernel/gentoo-kernel ~amd64
+virtual/dist-kernel ~amd64
+# --- browsers and utilities ---
+#fastfetch always accept latest:
+app-misc/fastfetch ~amd64
+#firefox always accept latest
+www-client/firefox ~amd64
+dev-libs/nss ~amd64
+dev-libs/nspr ~amd64
+www-client/firefox-l10n ~amd64
+#LACT always latest
+sys-apps/lact ~amd64
+dev-util/clinfo ~amd64
+#makemkv always latest
+media-video/makemkv ~amd64
+#mullvad vpn
+net-vpn/mullvadvpn-app ~amd64
+net-vpn/mullvad-netns ~amd64
+#obs-studio always latest
+media-video/obs-studio ~amd64
+#VLC always latest
+media-video/vlc ~amd64
+# --- gaming ---
+#gamemode and gamescope
+games-util/gamemode ~amd64
+gui-wm/gamescope ~amd64
+media-libs/vkroots ~amd64
+#heroic launcher always latest
+games-util/heroic-bin ~amd64
+#steam overlay and keywords
+*/*::steam-overlay
+games-util/game-device-udev-rules
+sys-libs/libudev-compat
+# --- gpu-specific ---
+#mesa drivers always latest
+media-libs/mesa ~amd64
+dev-util/mesa_clc ~amd64
+# --- desktop environment and other system stuff ---
+#plasma always latest
+kde-plasma/* ~amd64
+kde-frameworks/* ~amd64
+dev-libs/plasma-wayland-protocols ~amd64
+dev-libs/icu ~amd64
+app-crypt/gocryptfs ~amd64
+#qt always latest
+dev-qt/* ~amd64
+#misc
+media-gfx/qimgv ~amd64 #this is for webm support AFAIK
+#shellcheck
+dev-util/shellcheck ~amd64
+dev-haskell/* ~amd64
+app-admin/haskell-updater ~amd64
+dev-lang/ghc ~amd64

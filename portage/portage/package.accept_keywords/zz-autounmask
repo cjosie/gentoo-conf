@@ -1,0 +1,5 @@
+# required by www-client/firefox-152.0::gentoo
+# required by @de
+# required by @selected
+# required by @world (argument)
+=dev-util/cbindgen-0.29.4 ~amd64

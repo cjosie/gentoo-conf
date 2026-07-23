@@ -55,7 +55,7 @@ do_backup() {
     if [[ -d ${BACKUP_ROOT}/.git ]]; then
         git -C "${BACKUP_ROOT}" add -A
         git -C "${BACKUP_ROOT}" commit -m "backup $(date +%F_%H%M)" || true
-        git -C "${BACKUP_ROOT}" push || echo "push failed (offline?); commit is local" >&2
+        git -C "${BACKUP_ROOT}" push origin main || echo "push failed (offline?); commit is local" >&2
     fi
     echo "Backup complete: ${BACKUP_ROOT}"
 }

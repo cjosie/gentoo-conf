@@ -1,0 +1,62 @@
+# Josie's desktop environment
+
+#plasma core:
+kde-plasma/plasma-desktop
+kde-plasma/kwin
+kde-plasma/plasma-workspace
+kde-plasma/sddm-kcm
+x11-misc/sddm
+sys-auth/seatd
+
+#display tech / screen management:
+kde-plasma/kscreen
+kde-plasma/kgamma
+kde-plasma/kwayland
+
+#utilities:
+kde-plasma/systemsettings
+kde-plasma/plasma-systemmonitor
+kde-plasma/kdeplasma-addons
+kde-plasma/spectacle
+kde-plasma/keditfiletype
+#kde-plasma/kmenuedit
+kde-plasma/kde-gtk-config
+kde-plasma/plasma-integration
+kde-plasma/plasma-nm
+kde-apps/ark
+app-arch/rar
+app-arch/lrzip
+dev-util/shellcheck
+
+#keychain
+kde-frameworks/kwallet
+kde-apps/kwalletmanager
+kde-plasma/kwallet-pam
+
+#kde apps:
+kde-apps/k3b
+kde-apps/dolphin
+kde-apps/kdenetwork-filesharing
+kde-apps/kwrite
+kde-apps/kmix
+
+#other apps:
+media-video/makemkv
+media-video/vlc
+media-sound/strawberry
+x11-terms/kitty
+mail-client/thunderbird
+www-client/firefox
+sys-process/htop
+sys-process/btop
+sys-apps/amdgpu_top
+
+#misc drivers
+media-libs/mesa
+x11-apps/mesa-progs
+
+#misc bits plasma-meta was rolling in before:
+sys-apps/smartmontools
+
+
+

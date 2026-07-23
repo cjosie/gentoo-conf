@@ -1,0 +1,8 @@
+# required by media-video/makemkv (argument)
+>=media-video/makemkv-1.18.2 MakeMKV-EULA
+# required by media-video/amdgpu-pro-amf (argument)
+>=media-video/amdgpu-pro-amf-1.4.37.2194696 AMD-GPU-PRO-EULA
+# steam license terms
+games-util/steam-launcher ValveSteamLicense
+# rar license
+app-arch/rar RAR

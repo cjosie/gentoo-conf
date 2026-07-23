@@ -1,0 +1,2 @@
+#!/bin/sh
+echo 1000 > /sys/kernel/mm/lru_gen/min_ttl_ms

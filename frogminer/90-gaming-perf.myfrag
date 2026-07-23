@@ -1,0 +1,57 @@
+# 90-gaming-perf.myfrag — linux-tkg config fragment
+# 12600K / RX 9060 XT gaming box — snappiness + debloat pass
+# Drop next to the PKGBUILD (tkg picks up *.myfrag when _config_fragments="true")
+SYSFB_SIMPLEFB=y
+
+## Idle governor: TEO instead of menu (menu outranks TEO if both are built)
+CONFIG_CPU_IDLE_GOV_TEO=y
+# CONFIG_CPU_IDLE_GOV_MENU is not set
+
+## THP always (was madvise). If you ever see compaction stutter,
+## echo defer > /sys/kernel/mm/transparent_hugepage/defrag instead of reverting.
+CONFIG_TRANSPARENT_HUGEPAGE_ALWAYS=y
+# CONFIG_TRANSPARENT_HUGEPAGE_MADVISE is not set
+
+## Hardening with measurable hot-path cost — deliberate tradeoff
+# CONFIG_INIT_ON_ALLOC_DEFAULT_ON is not set
+CONFIG_INIT_STACK_NONE=y
+# CONFIG_INIT_STACK_ALL_ZERO is not set
+# CONFIG_HARDENED_USERCOPY is not set
+# CONFIG_SLAB_FREELIST_RANDOM is not set
+# CONFIG_SLAB_FREELIST_HARDENED is not set
+
+## Debug leftovers _debugdisable missed
+CONFIG_DEBUG_INFO_NONE=y
+# CONFIG_DEBUG_INFO is not set
+# CONFIG_KGDB is not set
+# CONFIG_KFENCE is not set
+# CONFIG_DEBUG_LIST is not set
+# CONFIG_SLUB_DEBUG is not set
+# CONFIG_LOCKUP_DETECTOR is not set
+# CONFIG_SOFTLOCKUP_DETECTOR is not set
+# CONFIG_ACPI_DEBUG is not set
+# CONFIG_PM_DEBUG is not set
+# CONFIG_PM_TRACE_RTC is not set
+# CONFIG_DYNAMIC_DEBUG is not set
+# CONFIG_IWLWIFI_DEBUG is not set
+# CONFIG_IWLWIFI_DEBUGFS is not set
+
+## LSMs compiled but not in your active list (CONFIG_LSM="landlock,yama,bpf")
+## — pure dead weight. Audit goes with SELinux (drop if you don't run auditd).
+# CONFIG_SECURITY_SELINUX is not set
+# CONFIG_SECURITY_APPARMOR is not set
+# CONFIG_AUDIT is not set
+
+## Misc
+# CONFIG_NVME_MULTIPATH is not set
+CONFIG_CRYPTO_ZSTD=y
+CONFIG_ZSWAP_COMPRESSOR_DEFAULT_ZSTD=y
+CONFIG_ZSWAP_COMPRESSOR_DEFAULT="zstd"
+
+## Initramfs-less boot: NVMe built in (rootfs ext4/btrfs already =y)
+CONFIG_NVME_CORE=y
+CONFIG_BLK_DEV_NVME=y
+
+## No hibernation (suspend-to-RAM stays)
+# CONFIG_HIBERNATION is not set
+CONFIG_SUSPEND=y

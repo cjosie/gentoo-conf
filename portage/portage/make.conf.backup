@@ -1,0 +1,39 @@
+# josie's gaming PC make.conf
+
+# Regular flags:
+WARNING_FLAGS="-Werror=odr -Werror=lto-type-mismatch -Werror=strict-aliasing"
+COMMON_FLAGS="-march=alderlake -O3 -pipe -flto ${WARNING_FLAGS}"
+# Common Flags for GCC on the 12600KF (Comment out the above and un-comment these):
+#COMMON_FLAGS="-march=alderlake -mabm -mno-kl -mno-pconfig -mno-sgx -mno-widekl -mshstk --param=l1-cache-line-size=64 --param=l1-cache-size=48 --param=l2-cache-size=20480 -O3 -pipe"
+CFLAGS="${COMMON_FLAGS}"
+CXXFLAGS="${COMMON_FLAGS}"
+FCFLAGS="${COMMON_FLAGS}"
+FFLAGS="${COMMON_FLAGS}"
+LDFLAGS="${COMMON_FLAGS} ${LDFLAGS}"
+RUSTFLAGS="${RUSTFFLAGS} -C target-cpu=native"
+
+# Make options for 12600K (16t) and 32GB RAM (2GB per thread)
+MAKEOPTS="-j16 -l24"
+# uncomment both lines if using emerge default ops
+#MAKEOPTS="-j8 -l20"
+#EMERGE_DEFAULT_OPTS="--jobs 2 --load-average 6"
+
+# accept all licenses except EULAs
+ACCEPT_LICENSE="* -@EULA"
+
+# USE flags
+DONTUSE=" -telemetry -pulseaudio -qt5 -i915 -chromium -webengine -libreoffice -gtk -gnome -systemd -radeon -nouveau -dist-kernel"
+DOUSE="sddm pipewire lm-sensors xwayland wayland dbus elogind qt6 dvd cdr vulkan mesa amdgpu networkmanager lto pgo vaapi firefox"
+USE="${DONTUSE} ${DOUSE}"
+
+# This sets the language of build output to English.
+# Please keep this setting intact when reporting bugs.
+LC_MESSAGES=C.UTF-8
+
+
+GENTOO_MIRRORS="https://mirror.clarkson.edu/gentoo/ \
+    https://mirrors.kernel.org/gentoo/ \
+    https://mirror.rackspace.com/gentoo/"
+GENTOO_MIRRORS="https://mirrors.kernel.org/gentoo/ \
+    https://mirrors.mit.edu/gentoo-distfiles/ \
+    https://mirror.rackspace.com/gentoo/"
