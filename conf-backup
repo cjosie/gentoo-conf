@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# conf-backup - back up / restore josie's kernel + portage configuration
+# Usage:  conf-backup backup      copy live configs into ~/conf-backups
+#         conf-backup install    copy backups back into place (needs root for /etc/portage)
+#         conf-backup diff       show what differs between live and backup
+set -euo pipefail
+
+BACKUP_ROOT="${HOME}/conf-backups"
+
+# ---- manifest -------------------------------------------------------------
+# format: "source_path|subdir_in_backup|owner_on_restore"
+# Directories are copied recursively. $HOME is expanded at runtime.
+MANIFEST=(
+  "${HOME}/.config/frogminer/linux-tkg.cfg|frogminer|${USER}:${USER}"
+  "${HOME}/linux-tkg/90-gaming-perf.myfrag|frogminer|${USER}:${USER}"
+  "/etc/portage|portage|root:root"
+  "/etc/default/grub|system|root:root"
+  "/etc/sysctl.d|system-sysctl.d|root:root"
+  "/etc/local.d|system-local.d|root:root"
+  "/etc/rc.conf|system|root:root"
+)
+# ---------------------------------------------------------------------------
+
+# escalate helper: prefer doas, fall back to sudo, skip if already root
+as_root() {
+    if [[ ${EUID} -eq 0 ]]; then "$@"
+    elif command -v doas >/dev/null 2>&1; then doas "$@"
+    else sudo "$@"
+    fi
+}
+
+do_backup() {
+    mkdir -p "${BACKUP_ROOT}"
+    local src sub _owner base
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub _owner <<< "${entry}"
+        if [[ ! -e ${src} ]]; then
+            echo "SKIP (missing): ${src}" >&2
+            continue
+        fi
+        mkdir -p "${BACKUP_ROOT}/${sub}"
+        # -a preserves perms/times; --delete keeps dir backups exact mirrors
+        if [[ -d ${src} ]]; then
+            rsync -a --delete "${src}/" "${BACKUP_ROOT}/${sub}/$(basename "${src}")/"
+        else
+            rsync -a "${src}" "${BACKUP_ROOT}/${sub}/"
+        fi
+        echo "backed up: ${src}"
+    done
+    # snapshot the currently-running kernel config too, since we can
+    if [[ -r /proc/config.gz ]]; then
+        zcat /proc/config.gz > "${BACKUP_ROOT}/frogminer/running-kernel.config"
+        echo "backed up: /proc/config.gz -> frogminer/running-kernel.config"
+    fi
+    if [[ -d ${BACKUP_ROOT}/.git ]]; then
+        git -C "${BACKUP_ROOT}" add -A
+        git -C "${BACKUP_ROOT}" commit -m "backup $(date +%F_%H%M)" || true
+        git -C "${BACKUP_ROOT}" push || echo "push failed (offline?); commit is local" >&2
+    fi
+    echo "Backup complete: ${BACKUP_ROOT}"
+}
+
+do_install() {
+    local src sub owner base stored
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub owner <<< "${entry}"
+        base="$(basename "${src}")"
+        stored="${BACKUP_ROOT}/${sub}/${base}"
+        if [[ ! -e ${stored} ]]; then
+            echo "SKIP (no backup): ${stored}" >&2
+            continue
+        fi
+        if [[ ${src} == /etc/* ]]; then
+            # system path: restore as root, force ownership
+            if [[ -d ${stored} ]]; then
+                as_root rsync -a "${stored}/" "${src}/"
+            else
+                as_root rsync -a "${stored}" "${src}"
+            fi
+            as_root chown -R "${owner}" "${src}"
+        else
+            mkdir -p "$(dirname "${src}")"
+            if [[ -d ${stored} ]]; then
+                rsync -a "${stored}/" "${src}/"
+            else
+                rsync -a "${stored}" "${src}"
+            fi
+        fi
+        echo "installed: ${src}"
+    done
+    echo "Install complete. Review with: $(basename "$0") diff"
+}
+
+do_diff() {
+    local src sub _owner base stored rc=0
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub _owner <<< "${entry}"
+        base="$(basename "${src}")"
+        stored="${BACKUP_ROOT}/${sub}/${base}"
+        [[ -e ${stored} && -e ${src} ]] || { echo "-- ${src}: missing on one side"; continue; }
+        if ! diff -ru --brief "${stored}" "${src}"; then rc=1; fi
+    done
+    return ${rc}
+}
+
+case "${1:-}" in
+    backup)  do_backup ;;
+    install) do_install ;;
+    diff)    do_diff ;;
+    *)       echo "Usage: $(basename "$0") {backup|install|diff}" >&2; exit 1 ;;
+esac
