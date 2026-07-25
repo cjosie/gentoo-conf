@@ -19,6 +19,7 @@ MANIFEST=(
   "/etc/local.d|system-local.d|root:root"
   "/etc/rc.conf|system|root:root"
   "/etc/ananicy.d|system-ananicy.d|root:root"
+  "/etc/environment.d/99-proton-env.conf|root:root"
 )
 # ---------------------------------------------------------------------------
 

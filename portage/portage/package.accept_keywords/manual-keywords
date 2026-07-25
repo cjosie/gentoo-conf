@@ -26,12 +26,11 @@ media-video/obs-studio ~amd64
 #VLC always latest
 media-video/vlc ~amd64
 # --- gaming ---
-#gamemode and gamescope
-games-util/gamemode ~amd64
+#umu 
+games-util/umu-launcher ~amd64
+#gamescope
 gui-wm/gamescope ~amd64
 media-libs/vkroots ~amd64
-#heroic launcher always latest
-games-util/heroic-bin ~amd64
 #steam overlay and keywords
 */*::steam-overlay
 games-util/game-device-udev-rules
