@@ -1,0 +1,4 @@
+# firefox
+www-client/firefox firefox.conf
+#gcc
+sys-devel/gcc gcc.conf
