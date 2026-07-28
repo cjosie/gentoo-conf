@@ -6,7 +6,6 @@ kde-plasma/kwin
 kde-plasma/plasma-workspace
 kde-plasma/sddm-kcm
 x11-misc/sddm
-sys-auth/seatd
 
 #display tech / screen management:
 kde-plasma/kscreen
@@ -55,6 +54,9 @@ sys-apps/amdgpu_top
 app-shells/fish
 app-shells/dash
 app-shells/pwsh
+
+#other system stuff
+app-admin/doas
 
 #misc drivers
 media-libs/mesa
