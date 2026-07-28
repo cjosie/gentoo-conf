@@ -54,7 +54,7 @@ sys-apps/amdgpu_top
 #shell bits
 app-shells/fish
 app-shells/dash
-app-shells pwsh
+app-shells/pwsh
 
 #misc drivers
 media-libs/mesa
