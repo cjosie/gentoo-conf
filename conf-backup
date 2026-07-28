@@ -13,13 +13,15 @@ BACKUP_ROOT="${HOME}/conf-backups"
 MANIFEST=(
   "${HOME}/.config/frogminer/linux-tkg.cfg|frogminer|${USER}:${USER}"
   "${HOME}/linux-tkg/90-gaming-perf.myfrag|frogminer|${USER}:${USER}"
+  "${HOME}/.config/kitty/kitty.conf|${USER}:${USER}"
+  "${HOME}/.config/fish|${USER}:${USER}"
   "/etc/portage|portage|root:root"
   "/etc/default/grub|system|root:root"
   "/etc/sysctl.d|system-sysctl.d|root:root"
   "/etc/local.d|system-local.d|root:root"
   "/etc/rc.conf|system|root:root"
   "/etc/ananicy.d|system-ananicy.d|root:root"
-  "/etc/environment.d/99-proton-env.conf|root:root"
+  "/etc/environment.d/99-proton-env.conf|environment|root:root"
 )
 # ---------------------------------------------------------------------------
 
