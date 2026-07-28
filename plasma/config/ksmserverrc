@@ -1,0 +1,18 @@
+[General]
+loginMode=emptySession
+
+[LegacySession: saved at previous logout]
+count=0
+
+[Session: saved at previous logout]
+clientId1=1013c101dbd8000176360612200000024850004
+clientId2=1013c101dbd8000176360629000000024850005
+count=2
+program1=firefox
+program2=thunderbird
+restartCommand1=/usr/bin/firefox,--sm-client-id,1013c101dbd8000176360612200000024850004
+restartCommand2=/usr/bin/thunderbird,--sm-client-id,1013c101dbd8000176360629000000024850005
+restartStyleHint1=0
+restartStyleHint2=0
+userId1=josie
+userId2=josie

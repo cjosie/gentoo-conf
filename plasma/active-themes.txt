@@ -1,0 +1,11 @@
+# Active Plasma theming on josie-home, 2026-07-28T00:23:46-05:00
+# Restoring the config files only reproduces the look if these are present.
+
+look-and-feel:   joser
+color scheme:    BreezeDark
+icon theme:      breeze-dark
+plasma theme:    breeze-dark
+window deco:     __aurorae__svg__Utterly-Round-Dark
+splash:          SimpleTuxSplash-Plasma6
+cursor theme:    Adisila-Leony
+cursor size:     24

@@ -1,0 +1,12 @@
+[General]
+count=1
+rules=ef11c015-56a8-4880-9316-b1771dc30b4c
+
+[ef11c015-56a8-4880-9316-b1771dc30b4c]
+Description=Application settings for steam
+clientmachine=localhost
+noborder=true
+noborderrule=4
+wmclass=steamwebhelper steam
+wmclasscomplete=true
+wmclassmatch=1

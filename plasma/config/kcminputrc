@@ -1,0 +1,9 @@
+[Keyboard]
+NumLock=0
+
+[Libinput][14402][9229][EVGA Corporation EVGA X17 Gaming Mouse]
+PointerAcceleration=0.600
+PointerAccelerationProfile=1
+
+[Mouse]
+X11LibInputXAccelProfileFlat=true
