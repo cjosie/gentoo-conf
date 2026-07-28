@@ -5,6 +5,10 @@ sys-apps/dbus elogind -systemd
 sys-auth/seatd elogind
 app-alternatives/sh -bash dash
 sys-devel/gcc -fortran lto pgo
+dev-vcs/git rust keyring 
+#shell bits
+sys-apps/eza git
+app-shells/fish -debug
 #graphics
 x11-base/xorg-drivers VIDEO_CARDS: -radeonsi
 #plasma options
