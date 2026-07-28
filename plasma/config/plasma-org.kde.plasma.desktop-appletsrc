@@ -60,7 +60,7 @@ DialogHeight=630
 DialogWidth=810
 
 [Containments][2][Applets][5][Configuration][General]
-launchers=applications:firefox.desktop,applications:thunderbird-esr.desktop,applications:dev.vencord.Vesktop.desktop,applications:org.kde.dolphin.desktop,applications:steam.desktop,applications:com.heroicgameslauncher.hgl.desktop,applications:org.prismlauncher.PrismLauncher.desktop,applications:org.strawberrymusicplayer.strawberry.desktop,applications:org.kde.kwrite.desktop,applications:dev.zed.Zed.desktop
+launchers=applications:firefox.desktop,applications:thunderbird-esr.desktop,applications:dev.vencord.Vesktop.desktop,applications:org.kde.dolphin.desktop,applications:steam.desktop,applications:org.prismlauncher.PrismLauncher.desktop,applications:org.strawberrymusicplayer.strawberry.desktop,applications:org.kde.kwrite.desktop,applications:dev.zed.Zed.desktop
 
 [Containments][2][Applets][6]
 immutability=1
@@ -465,4 +465,4 @@ AppletOrder=56;26;28;54;51;52;53;55;29;50
 
 [ScreenMapping]
 itemsOnDisabledScreens=
-screenMapping=desktop:/rsi launcher.exe.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/STAR WARS Jedi Survivor.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Baldur's Gate 3.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Psychopomp GOLD.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/DEATH STRANDING 2 ON THE BEACH.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Deep Snow Delivery Demo.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Nightingale.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/It gets so lonely here.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d
+screenMapping=desktop:/Deep Snow Delivery Demo.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/rsi launcher.exe.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Nightingale.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/DEATH STRANDING 2 ON THE BEACH.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/It gets so lonely here.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Psychopomp GOLD.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/Baldur's Gate 3.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d,desktop:/STAR WARS Jedi Survivor.desktop,0,aaf047ca-3e52-4f64-86d2-27ed4ce4079d
