@@ -51,6 +51,11 @@ sys-process/htop
 sys-process/btop
 sys-apps/amdgpu_top
 
+#shell bits
+app-shells/fish
+app-shells/dash
+app-shells pwsh
+
 #misc drivers
 media-libs/mesa
 x11-apps/mesa-progs
