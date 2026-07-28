@@ -1,0 +1,255 @@
+#!/usr/bin/env bash
+# plasma-backup - back up / restore josie's KDE Plasma desktop configuration
+# Sister script to conf-backup; everything lands under ~/conf-backups/plasma.
+# Usage:  plasma-backup backup                       copy live Plasma config into the repo
+#         plasma-backup install [--force] [--with-layout]
+#                                                    copy backups back into place
+#         plasma-backup diff                         show what differs between live and backup
+#
+# install notes:
+#   --force        restore even while a Plasma session is running (it will be
+#                  overwritten again on logout - restore from a TTY instead)
+#   --with-layout  also restore the panel/widget layout, which is pinned to this
+#                  machine's exact monitor setup
+set -euo pipefail
+
+REPO_ROOT="${HOME}/conf-backups"
+BACKUP_ROOT="${REPO_ROOT}/plasma"
+
+# ---- manifest -------------------------------------------------------------
+# format: "source_path|subdir_in_backup|owner_on_restore"
+# Directories are copied recursively. $HOME is expanded at runtime.
+MANIFEST=(
+  # --- Plasma / KDE settings -----------------------------------------------
+  "${HOME}/.config/kdeglobals|config|${USER}:${USER}"
+  "${HOME}/.config/kwinrc|config|${USER}:${USER}"
+  "${HOME}/.config/kwinrulesrc|config|${USER}:${USER}"
+  "${HOME}/.config/kwin_dialogsrc|config|${USER}:${USER}"
+  "${HOME}/.config/plasmarc|config|${USER}:${USER}"
+  "${HOME}/.config/plasmashellrc|config|${USER}:${USER}"
+  "${HOME}/.config/plasmaparc|config|${USER}:${USER}"
+  "${HOME}/.config/plasmanotifyrc|config|${USER}:${USER}"
+  "${HOME}/.config/plasma-localerc|config|${USER}:${USER}"
+  "${HOME}/.config/kglobalshortcutsrc|config|${USER}:${USER}"
+  "${HOME}/.config/kcminputrc|config|${USER}:${USER}"
+  "${HOME}/.config/ksmserverrc|config|${USER}:${USER}"
+  "${HOME}/.config/kscreenlockerrc|config|${USER}:${USER}"
+  "${HOME}/.config/kded5rc|config|${USER}:${USER}"
+  "${HOME}/.config/kactivitymanagerdrc|config|${USER}:${USER}"
+  "${HOME}/.config/powermanagementprofilesrc|config|${USER}:${USER}"
+  "${HOME}/.config/xdg-desktop-portal-kderc|config|${USER}:${USER}"
+  "${HOME}/.config/kwalletrc|config|${USER}:${USER}"
+  "${HOME}/.config/breezerc|config|${USER}:${USER}"
+  "${HOME}/.config/dolphinrc|config|${USER}:${USER}"
+  "${HOME}/.config/klipperrc|config|${USER}:${USER}"
+  "${HOME}/.config/krunnerrc|config|${USER}:${USER}"
+  "${HOME}/.config/spectaclerc|config|${USER}:${USER}"
+  "${HOME}/.config/baloofilerc|config|${USER}:${USER}"
+  "${HOME}/.config/baloofileinformationrc|config|${USER}:${USER}"
+  "${HOME}/.config/kdedefaults|config|${USER}:${USER}"
+  "${HOME}/.config/kde.org|config|${USER}:${USER}"
+  "${HOME}/.config/plasma-workspace|config|${USER}:${USER}"
+  # panel + widget layout: pinned to this machine's screen IDs, see LAYOUT_SPECIFIC
+  "${HOME}/.config/plasma-org.kde.plasma.desktop-appletsrc|config|${USER}:${USER}"
+
+  # --- GTK side of the theming (so GTK apps match Plasma) -------------------
+  "${HOME}/.config/gtk-3.0|gtk|${USER}:${USER}"
+  "${HOME}/.config/gtk-4.0|gtk|${USER}:${USER}"
+  "${HOME}/.config/gtkrc|gtk|${USER}:${USER}"
+  "${HOME}/.config/gtkrc-2.0|gtk|${USER}:${USER}"
+  "${HOME}/.gtkrc-2.0|gtk|${USER}:${USER}"
+
+  # --- assets the settings point at ----------------------------------------
+  # Without these a restored config silently falls back to stock Breeze.
+  "${HOME}/.local/share/plasma|share|${USER}:${USER}"
+  "${HOME}/.local/share/aurorae|share|${USER}:${USER}"
+  "${HOME}/.local/share/konsole|share|${USER}:${USER}"
+  "${HOME}/.local/share/plasma-systemmonitor|share|${USER}:${USER}"
+
+  # --- cursor theme ---------------------------------------------------------
+  "${HOME}/.icons|cursor|${USER}:${USER}"
+)
+
+# Backed up, but NOT restored unless --with-layout: these encode this machine's
+# exact output layout and will scatter panels onto the wrong screens elsewhere.
+LAYOUT_SPECIFIC=(
+  "plasma-org.kde.plasma.desktop-appletsrc"
+)
+
+# Deliberately NOT in the manifest:
+#   ~/.config/kwinoutputconfig.json, ~/.local/share/kscreen  - per-hardware display state
+#   ~/.local/share/kactivitymanagerd/resources               - 4M usage-tracking sqlite db
+#   ~/.local/share/icons/hicolor                             - generated app-icon cache
+#   ~/.local/share/kwalletd                                  - wallet secrets, repo is on github
+# ---------------------------------------------------------------------------
+
+# escalate helper: prefer doas, fall back to sudo, skip if already root
+as_root() {
+    if [[ ${EUID} -eq 0 ]]; then "$@"
+    elif command -v doas >/dev/null 2>&1; then doas "$@"
+    else sudo "$@"
+    fi
+}
+
+plasma_running() {
+    pgrep -u "${USER}" -x plasmashell >/dev/null 2>&1
+}
+
+is_layout_specific() {
+    local base=$1 entry
+    for entry in "${LAYOUT_SPECIFIC[@]}"; do
+        if [[ ${base} == "${entry}" ]]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+# ini_get <file> <section> <key> - print a KConfig/ini value, or nothing
+ini_get() {
+    local file=$1 section=$2 key=$3
+    [[ -r ${file} ]] || return 0
+    awk -F= -v sect="[${section}]" -v k="${key}" '
+        /^\[/    { in_sect = ($0 == sect); next }
+        in_sect && $1 == k { sub(/^[^=]*=/, ""); print; exit }
+    ' "${file}"
+}
+
+# kde_get <config_basename> <section> <key>
+# The active look-and-feel package writes its values into ~/.config/kdedefaults/,
+# and ~/.config/ holds only the user's overrides on top - so check both.
+kde_get() {
+    local file=$1 section=$2 key=$3 val
+    val="$(ini_get "${HOME}/.config/${file}" "${section}" "${key}")"
+    [[ -n ${val} ]] || val="$(ini_get "${HOME}/.config/kdedefaults/${file}" "${section}" "${key}")"
+    printf '%s' "${val}"
+}
+
+# Record the names of the active themes. The config files reference these by
+# name, so on a fresh install you need this list to know what to reinstall.
+write_theme_summary() {
+    local out="${BACKUP_ROOT}/active-themes.txt" deco
+    # Plasma 6.4+ moved the group to kdecoration3; older setups still use 2
+    deco="$(kde_get kwinrc org.kde.kdecoration3 theme)"
+    [[ -n ${deco} ]] || deco="$(kde_get kwinrc org.kde.kdecoration2 theme)"
+    {
+        echo "# Active Plasma theming on $(uname -n), $(date -Iseconds)"
+        echo "# Restoring the config files only reproduces the look if these are present."
+        echo
+        printf '%-16s %s\n' "look-and-feel:" "$(kde_get kdeglobals KDE LookAndFeelPackage)"
+        printf '%-16s %s\n' "color scheme:"  "$(kde_get kdeglobals General ColorScheme)"
+        printf '%-16s %s\n' "icon theme:"    "$(kde_get kdeglobals Icons Theme)"
+        printf '%-16s %s\n' "plasma theme:"  "$(kde_get plasmarc Theme name)"
+        printf '%-16s %s\n' "window deco:"   "${deco}"
+        printf '%-16s %s\n' "splash:"        "$(kde_get ksplashrc KSplash Theme)"
+        printf '%-16s %s\n' "cursor theme:"  "$(kde_get kcminputrc Mouse cursorTheme)"
+        printf '%-16s %s\n' "cursor size:"   "$(ini_get "${HOME}/.config/gtk-3.0/settings.ini" Settings gtk-cursor-theme-size)"
+    } > "${out}"
+    echo "wrote: plasma/active-themes.txt"
+}
+
+do_backup() {
+    mkdir -p "${BACKUP_ROOT}"
+    local src sub _owner
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub _owner <<< "${entry}"
+        if [[ ! -e ${src} ]]; then
+            echo "SKIP (missing): ${src}" >&2
+            continue
+        fi
+        mkdir -p "${BACKUP_ROOT}/${sub}"
+        # -a preserves perms/times; --delete keeps dir backups exact mirrors
+        if [[ -d ${src} ]]; then
+            rsync -a --delete "${src}/" "${BACKUP_ROOT}/${sub}/$(basename "${src}")/"
+        else
+            rsync -a "${src}" "${BACKUP_ROOT}/${sub}/"
+        fi
+        echo "backed up: ${src}"
+    done
+    write_theme_summary
+    if [[ -d ${REPO_ROOT}/.git ]]; then
+        # scoped to plasma/ so this doesn't sweep up conf-backup's territory
+        git -C "${REPO_ROOT}" add -A -- "${BACKUP_ROOT}"
+        git -C "${REPO_ROOT}" commit -m "plasma backup $(date +%F_%H%M)" || true
+        git -C "${REPO_ROOT}" push origin main || echo "push failed (offline?); commit is local" >&2
+    fi
+    echo "Backup complete: ${BACKUP_ROOT}"
+}
+
+do_install() {
+    if plasma_running && [[ ${FORCE} -eq 0 ]]; then
+        cat >&2 <<'EOF'
+refusing: a Plasma session is running.
+
+Plasma keeps its config in memory and flushes it on logout, so anything
+restored now gets overwritten. Log out and rerun from a TTY, or pass --force
+if you know what you're doing.
+EOF
+        exit 1
+    fi
+
+    local src sub owner base stored
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub owner <<< "${entry}"
+        base="$(basename "${src}")"
+        stored="${BACKUP_ROOT}/${sub}/${base}"
+        if [[ ! -e ${stored} ]]; then
+            echo "SKIP (no backup): ${stored}" >&2
+            continue
+        fi
+        if is_layout_specific "${base}" && [[ ${WITH_LAYOUT} -eq 0 ]]; then
+            echo "SKIP (screen-layout specific, pass --with-layout): ${base}" >&2
+            continue
+        fi
+        if [[ ${src} == /etc/* ]]; then
+            # system path: restore as root, force ownership
+            if [[ -d ${stored} ]]; then
+                as_root rsync -a "${stored}/" "${src}/"
+            else
+                as_root rsync -a "${stored}" "${src}"
+            fi
+            as_root chown -R "${owner}" "${src}"
+        else
+            mkdir -p "$(dirname "${src}")"
+            if [[ -d ${stored} ]]; then
+                rsync -a "${stored}/" "${src}/"
+            else
+                rsync -a "${stored}" "${src}"
+            fi
+        fi
+        echo "installed: ${src}"
+    done
+    echo "Install complete. Log in (or restart plasmashell) to pick it up."
+    echo "Review with: $(basename "$0") diff"
+}
+
+do_diff() {
+    local src sub _owner base stored rc=0
+    for entry in "${MANIFEST[@]}"; do
+        IFS='|' read -r src sub _owner <<< "${entry}"
+        base="$(basename "${src}")"
+        stored="${BACKUP_ROOT}/${sub}/${base}"
+        [[ -e ${stored} && -e ${src} ]] || { echo "-- ${src}: missing on one side"; continue; }
+        if ! diff -ru --brief "${stored}" "${src}"; then rc=1; fi
+    done
+    return ${rc}
+}
+
+FORCE=0
+WITH_LAYOUT=0
+CMD="${1:-}"
+shift || true
+for arg in "$@"; do
+    case "${arg}" in
+        --force)       FORCE=1 ;;
+        --with-layout) WITH_LAYOUT=1 ;;
+        *)             echo "unknown option: ${arg}" >&2; exit 1 ;;
+    esac
+done
+
+case "${CMD}" in
+    backup)  do_backup ;;
+    install) do_install ;;
+    diff)    do_diff ;;
+    *)       echo "Usage: $(basename "$0") {backup|install [--force] [--with-layout]|diff}" >&2; exit 1 ;;
+esac
