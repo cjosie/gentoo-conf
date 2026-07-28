@@ -41,7 +41,8 @@ kde-apps/kmix
 
 #other apps:
 media-video/makemkv
-media-video/vlc
+#media-video/vlc
+media-video/mpv
 media-sound/strawberry
 x11-terms/kitty
 mail-client/thunderbird
@@ -53,7 +54,7 @@ sys-apps/amdgpu_top
 #shell bits
 app-shells/fish
 app-shells/dash
-app-shells/pwsh
+#app-shells/pwsh
 
 #other system stuff
 app-admin/doas
