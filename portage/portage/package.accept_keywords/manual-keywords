@@ -6,6 +6,8 @@ sys-kernel/gentoo-sources ~amd64
 sys-kernel/gentoo-kernel ~amd64
 virtual/dist-kernel ~amd64
 # --- browsers and utilities ---
+#kvantum unmask
+x11-themes/kvantum ~amd64
 #fastfetch always accept latest:
 app-misc/fastfetch ~amd64
 #firefox always accept latest

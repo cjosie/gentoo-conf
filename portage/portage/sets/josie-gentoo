@@ -26,6 +26,7 @@ kde-apps/ark
 app-arch/rar
 app-arch/lrzip
 dev-util/shellcheck
+x11-themes/kvantum
 
 #keychain
 kde-frameworks/kwallet
@@ -54,7 +55,7 @@ sys-apps/amdgpu_top
 #shell bits
 app-shells/fish
 app-shells/dash
-#app-shells/pwsh
+sys-apps/eza
 
 #other system stuff
 app-admin/doas
