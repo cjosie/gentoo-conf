@@ -9,12 +9,13 @@ app-admin/doas pam persist
 #shell bits
 sys-apps/eza git
 app-shells/fish -debug
+app-misc/fastfetch -X drm wayland vaapi vulkan wayland opengl ddcutil
 #graphics
 x11-base/xorg-drivers VIDEO_CARDS: -radeonsi
 #plasma options
 kde-plasma/* wayland -browser-integration display-manager sddm elogind grub kwallet -qt5 -wacom -webengine -systemd
 kde-plasma/plasma-workspace X wayland
-x11-misc/sddm -X elogind -systemd
+x11-misc/sddm X elogind -systemd 
 net-dns/avahi mdnsresponder-compat
 media-libs/harfbuzz truetype
 #mozilla options
@@ -24,11 +25,11 @@ media-libs/libvpx postproc
 x11-base/xorg-server xvfb
 mail-client/thunderbird gtk lto
 #video/audio options
-media-video/ffmpeg opus bluray x265 x264 ocr alsa dvd extra svt-av1 vorbis vulkan
+media-video/ffmpeg -X opus bluray x265 x264 ocr alsa dvd extra svt-av1 vorbis vulkan
 media-video/pipewire dbus elogind gstreamer pipewire-alsa flatpak pulseaudio sound-server
-#vlc codecs and options
 #media-video/vlc bluray matroska mpeg x265 a52 alsa cddb jpeg mp3 opus png v4l wayland x264 lto -X
 media-libs/libva -X -glx wayland
+media-video/libva-utils -X wayland
 media-video/mpv -X -xv alsa drm egl lua vulkan archive bluray cdda dvd pipewire wayland zlib
 #other flags
 net-libs/ngtcp2 gnutls
