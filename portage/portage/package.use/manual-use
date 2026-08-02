@@ -10,6 +10,8 @@ app-admin/doas pam persist
 sys-apps/eza git
 app-shells/fish -debug
 app-misc/fastfetch -X drm wayland vaapi vulkan wayland opengl ddcutil
+#monitors
+sys-process/htop lm-sensors caps y
 #graphics
 x11-base/xorg-drivers VIDEO_CARDS: -radeonsi
 #plasma options

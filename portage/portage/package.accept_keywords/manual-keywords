@@ -18,6 +18,8 @@ www-client/firefox-l10n ~amd64
 #LACT always latest
 sys-apps/lact ~amd64
 dev-util/clinfo ~amd64
+#other gpu bits
+dev-util/rocm-smi ~amd64
 #makemkv always latest
 media-video/makemkv ~amd64
 #mullvad vpn
