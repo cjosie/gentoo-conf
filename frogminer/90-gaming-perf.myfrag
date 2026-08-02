@@ -52,6 +52,9 @@ CONFIG_ZSWAP_COMPRESSOR_DEFAULT="zstd"
 CONFIG_NVME_CORE=y
 CONFIG_BLK_DEV_NVME=y
 
+## Root filesystem built-in — required for initramfs-less boot
+CONFIG_XFS_FS=y
+
 ## No hibernation (suspend-to-RAM stays)
 # CONFIG_HIBERNATION is not set
 CONFIG_SUSPEND=y
