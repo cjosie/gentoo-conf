@@ -30,6 +30,14 @@ media-video/obs-studio ~amd64
 #VLC always latest
 media-video/vlc ~amd64
 # --- gaming ---
+#mangohud
+games-util/mangohud ~amd64
+media-libs/imgui ~amd64
+media-libs/implot ~amd64
+games-util/goverlay ~amd64
+#prism minecraft launcher
+games-action/prismlauncher ~amd64
+games-util/gamemode ~amd64
 #umu 
 games-util/umu-launcher ~amd64
 #gamescope

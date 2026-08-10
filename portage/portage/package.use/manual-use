@@ -14,6 +14,8 @@ app-misc/fastfetch -X drm wayland vaapi vulkan wayland opengl ddcutil
 sys-process/htop lm-sensors caps y
 #graphics
 x11-base/xorg-drivers VIDEO_CARDS: -radeonsi
+#mangohud dep
+dev-lang/fpc source
 #plasma options
 kde-plasma/* wayland -browser-integration display-manager sddm elogind grub kwallet -qt5 -wacom -webengine -systemd
 kde-plasma/plasma-workspace X wayland
