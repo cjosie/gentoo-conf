@@ -25,6 +25,7 @@ MANIFEST=(
   "/etc/rc.conf|system|root:root"
   "/etc/ananicy.d|system-ananicy.d|root:root"
   "/etc/environment.d/99-proton-env.conf|environment|root:root"
+  "${HOME}/scripts|scripts-folder|${USER}:${USER}"
 )
 # ---------------------------------------------------------------------------
 
