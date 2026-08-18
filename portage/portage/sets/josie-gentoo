@@ -56,16 +56,15 @@ sys-apps/amdgpu_top
 app-shells/fish
 app-shells/dash
 sys-apps/eza
-
-#other system stuff
 app-admin/doas
 
 #misc drivers
 media-libs/mesa
 x11-apps/mesa-progs
 
-#misc bits plasma-meta was rolling in before:
+#misc utilities
 sys-apps/smartmontools
 app-admin/ananicy-cpp
+sys-apps/fwupd
 
 
