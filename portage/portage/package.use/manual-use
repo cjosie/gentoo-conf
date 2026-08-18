@@ -6,7 +6,7 @@ app-alternatives/sh -bash dash
 sys-devel/gcc -fortran lto pgo
 dev-vcs/git rust keyring 
 app-admin/doas pam persist
-sys-apps/fwupd amdgpu elogind nvme -systemd uefi 
+sys-apps/fwupd amdgpu elogind nvme -systemd 
 #shell bits
 sys-apps/eza git
 app-shells/fish -debug
