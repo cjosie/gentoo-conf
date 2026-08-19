@@ -27,6 +27,13 @@ MANIFEST=(
   "/etc/environment.d/99-proton-env.conf|environment|root:root"
   "${HOME}/scripts|scripts-folder|${USER}:${USER}"
 )
+
+# ---- exclusions -----------------------------------------------------------
+# Absolute paths to skip when backing up. Any path that lives underneath a
+# directory in the MANIFEST above is excluded from that directory's rsync.
+EXCLUDES=(
+  "/etc/portage/gnupg"
+)
 # ---------------------------------------------------------------------------
 
 # escalate helper: prefer doas, fall back to sudo, skip if already root
@@ -35,6 +42,19 @@ as_root() {
     elif command -v doas >/dev/null 2>&1; then doas "$@"
     else sudo "$@"
     fi
+}
+
+# Populate the global RSYNC_EXCLUDES array with --exclude args for any EXCLUDES
+# entry living under the given source dir. Patterns are anchored with a leading
+# '/' so only the top-level match under that source is skipped.
+build_excludes() {
+    local src="${1%/}" ex
+    RSYNC_EXCLUDES=()
+    for ex in "${EXCLUDES[@]}"; do
+        if [[ ${ex} == "${src}/"* ]]; then
+            RSYNC_EXCLUDES+=( "--exclude=/${ex#"${src}/"}" )
+        fi
+    done
 }
 
 do_backup() {
@@ -49,7 +69,9 @@ do_backup() {
         mkdir -p "${BACKUP_ROOT}/${sub}"
         # -a preserves perms/times; --delete keeps dir backups exact mirrors
         if [[ -d ${src} ]]; then
-            rsync -a --delete "${src}/" "${BACKUP_ROOT}/${sub}/$(basename "${src}")/"
+            build_excludes "${src}"
+            rsync -a --delete --delete-excluded "${RSYNC_EXCLUDES[@]}" \
+                "${src}/" "${BACKUP_ROOT}/${sub}/$(basename "${src}")/"
         else
             rsync -a "${src}" "${BACKUP_ROOT}/${sub}/"
         fi
@@ -78,10 +100,11 @@ do_install() {
             echo "SKIP (no backup): ${stored}" >&2
             continue
         fi
+        build_excludes "${src}"
         if [[ ${src} == /etc/* ]]; then
             # system path: restore as root, force ownership
             if [[ -d ${stored} ]]; then
-                as_root rsync -a "${stored}/" "${src}/"
+                as_root rsync -a "${RSYNC_EXCLUDES[@]}" "${stored}/" "${src}/"
             else
                 as_root rsync -a "${stored}" "${src}"
             fi
@@ -89,7 +112,7 @@ do_install() {
         else
             mkdir -p "$(dirname "${src}")"
             if [[ -d ${stored} ]]; then
-                rsync -a "${stored}/" "${src}/"
+                rsync -a "${RSYNC_EXCLUDES[@]}" "${stored}/" "${src}/"
             else
                 rsync -a "${stored}" "${src}"
             fi
@@ -100,13 +123,18 @@ do_install() {
 }
 
 do_diff() {
-    local src sub _owner base stored rc=0
+    local src sub _owner base stored rc=0 ex
     for entry in "${MANIFEST[@]}"; do
         IFS='|' read -r src sub _owner <<< "${entry}"
         base="$(basename "${src}")"
         stored="${BACKUP_ROOT}/${sub}/${base}"
         [[ -e ${stored} && -e ${src} ]] || { echo "-- ${src}: missing on one side"; continue; }
-        if ! diff -ru --brief "${stored}" "${src}"; then rc=1; fi
+        # skip excluded subpaths (diff --exclude matches on basename)
+        local diff_excludes=()
+        for ex in "${EXCLUDES[@]}"; do
+            [[ ${ex} == "${src%/}/"* ]] && diff_excludes+=( "--exclude=$(basename "${ex}")" )
+        done
+        if ! diff -ru --brief "${diff_excludes[@]}" "${stored}" "${src}"; then rc=1; fi
     done
     return ${rc}
 }

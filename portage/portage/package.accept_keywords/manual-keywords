@@ -29,6 +29,8 @@ net-vpn/mullvad-netns ~amd64
 media-video/obs-studio ~amd64
 #VLC always latest
 media-video/vlc ~amd64
+#zfs always latest
+sys-apps/zfs ~amd64
 # --- gaming ---
 #mangohud
 games-util/mangohud ~amd64
