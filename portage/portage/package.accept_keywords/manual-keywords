@@ -31,6 +31,8 @@ media-video/obs-studio ~amd64
 media-video/vlc ~amd64
 #zfs always latest
 sys-apps/zfs ~amd64
+#opencode guru latest
+dev-util/opencode-bin ~amd64
 # --- gaming ---
 #mangohud
 games-util/mangohud ~amd64
